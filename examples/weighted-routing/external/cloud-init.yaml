@@ -1,0 +1,10 @@
+#cloud-config
+package_update: true
+package_upgrade: true
+packages:
+  - httpd
+  - nc
+runcmd:
+  - systemctl enable --now httpd
+  - echo "Welcome to Web Server $(hostname)" > /var/www/html/index.html
+  - echo "healthy" > /var/www/html/health
