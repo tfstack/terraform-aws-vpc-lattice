@@ -338,7 +338,9 @@ exports.handler = async (event) => {
                 '/orders',
                 '/payments',
                 '/inventory',
-                '/analytics'
+                '/analytics',
+                '/notifications',
+                '/health'
             ],
             timestamp: new Date().toISOString()
         })

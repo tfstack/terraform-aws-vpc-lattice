@@ -125,6 +125,56 @@ resource "aws_security_group" "ec2_web_server_2_sg" {
 }
 
 resource "aws_security_group" "ec2_web_server_3_sg" {
+  name        = "${local.base_name_2}-ec2-web-server-3-sg"
+  description = "Security group for ec2 web server 3"
+  vpc_id      = module.vpc_2.vpc_id
+
+  ingress {
+    description = "Allow HTTP port 8080 access"
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = [module.vpc_2.vpc_cidr, local.vpc_lattice_cidr]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = merge(local.tags_2, {
+    Name = "${local.base_name_2}-ec2-web-server-3-sg"
+  })
+}
+
+resource "aws_security_group" "ec2_web_server_4_sg" {
+  name        = "${local.base_name_2}-ec2-web-server-4-sg"
+  description = "Security group for ec2 web server 4"
+  vpc_id      = module.vpc_2.vpc_id
+
+  ingress {
+    description = "Allow HTTP port 8080 access"
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = [module.vpc_2.vpc_cidr, local.vpc_lattice_cidr]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = merge(local.tags_2, {
+    Name = "${local.base_name_2}-ec2-web-server-4-sg"
+  })
+}
+
+resource "aws_security_group" "ec2_web_server_5_sg" {
   name        = "${local.base_name_3}-ec2-web-server-3-sg"
   description = "Security group for EC2 web server 3"
   vpc_id      = module.vpc_3.vpc_id

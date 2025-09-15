@@ -150,6 +150,7 @@ module "ec2_web_server" {
               <button class="btn" onclick="loadData('payments')" style="background: #007cba;">Payments (Path-based)</button>
               <button class="btn" onclick="loadData('inventory')" style="background: #007cba;">Inventory (Path-based)</button>
               <button class="btn" onclick="loadData('notifications')" style="background: #6f42c1;">Notifications (EC2)</button>
+              <button class="btn" onclick="loadData('health')" style="background: #20c997; border: 2px solid #17a2b8; font-weight: bold;">🏥 Health (IP Target)</button>
               <button class="btn" onclick="loadData('analytics')" style="background: #ff6b35;">Analytics (Container)</button>
               <button class="btn" onclick="showDebug()" style="background: #dc3545;">Debug Info</button>
           </div>
@@ -160,6 +161,7 @@ module "ec2_web_server" {
                   <li><strong>Products (Green):</strong> Weighted routing - 50/50 split between v1 and v2 Lambda functions</li>
                   <li><strong>Other APIs (Blue):</strong> Path-based routing - direct routing to specific Lambda services</li>
                   <li><strong>Notifications (Purple):</strong> EC2 routing - nginx service running on EC2 instance</li>
+                  <li><strong>Health (Teal):</strong> <span style="color: #20c997; font-weight: bold;">IP Target routing</span> - Direct IP address targeting with nginx on EC2</li>
                   <li><strong>Analytics (Orange):</strong> Container routing - ECS Fargate container with advanced analytics</li>
               </ul>
           </div>
@@ -416,5 +418,67 @@ EOT
   instance_tags = {
     Service = "notifications"
     Domain  = "communication"
+  }
+}
+
+############################################
+# Health Service
+############################################
+
+module "ec2_health_service" {
+  source = "tfstack/ec2-server/aws"
+
+  name      = "${local.base_name_3}-ec2-health-service"
+  subnet_id = module.vpc_3.private_subnet_ids[2]
+  vpc_id    = module.vpc_3.vpc_id
+
+  create_security_group  = false
+  vpc_security_group_ids = [aws_security_group.ec2_health_service_sg.id]
+
+  instance_type    = "t3.micro"
+  assign_public_ip = false
+  enable_ssm       = true
+
+  user_data = <<-EOT
+#!/bin/bash
+exec > >(tee /var/log/user-data.log) 2>&1
+
+echo "Starting health service setup..."
+
+# Update system
+if command -v dnf >/dev/null 2>&1; then
+  dnf -y update
+else
+  yum -y update
+fi
+
+# Install nginx using amazon-linux-extras
+amazon-linux-extras install nginx1 -y
+
+# Configure nginx
+cat > /etc/nginx/conf.d/default.conf << 'NGINX'
+server {
+    listen 80;
+    location /health {
+        add_header Content-Type application/json;
+        return 200 '{"status":"healthy","service":"health-service","timestamp":"2024-01-15T10:30:00Z"}';
+    }
+    location / {
+        add_header Content-Type application/json;
+        return 200 '{"api_version":"1.0","service":"health-service","message":"Health Service (EC2)","health":[{"id":"H001","type":"cpu","status":"healthy","value":"85%"},{"id":"H002","type":"memory","status":"healthy","value":"45%"},{"id":"H003","type":"disk","status":"healthy","value":"75%"}],"_demo_info":{"service_type":"Health Service (EC2)","target_url":"http://api.example.local/health","routing_method":"Path-based"}}';
+    }
+}
+NGINX
+
+# Start and enable nginx
+systemctl start nginx
+systemctl enable nginx
+
+echo "Health service setup completed successfully!"
+EOT
+
+  instance_tags = {
+    Service = "health"
+    Domain  = "health"
   }
 }

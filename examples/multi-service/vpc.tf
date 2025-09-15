@@ -200,6 +200,28 @@ resource "aws_security_group" "notifications_service_sg" {
   tags = local.tags_3
 }
 
+resource "aws_security_group" "ec2_health_service_sg" {
+  name   = "${local.base_name_3}-health-service-sg"
+  vpc_id = module.vpc_3.vpc_id
+
+  ingress {
+    description = "Allow HTTP port 80 access"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [module.vpc_3.vpc_cidr, local.vpc_lattice_cidr]
+  }
+
+  egress {
+    from_port   = 0
+    protocol    = "-1"
+    to_port     = 0
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = local.tags_3
+}
+
 resource "aws_security_group" "vpc_lattice_3_sg" {
   name        = "${local.base_name_3}-vpc-lattice-sg"
   description = "Security group for VPC Lattice 3"

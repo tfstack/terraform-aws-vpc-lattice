@@ -31,7 +31,6 @@ output "jumphost" {
     instance_id = module.ec2_client.instance_id
     private_ip  = module.ec2_client.private_ip
     public_ip   = module.ec2_client.public_ip
-    ssh_command = "ssh -i your-key.pem ec2-user@${module.ec2_client.public_ip}"
   }
 }
 
@@ -44,15 +43,13 @@ output "test_commands" {
     api_inventory     = "curl -s api.example.local/inventory | jq ."
     api_analytics     = "curl -s api.example.local/analytics | jq ."
     api_notifications = "curl -s api.example.local/notifications | jq ."
+    api_health        = "curl -s api.example.local/health | jq ."
 
     # Products Service (Weighted routing)
     products_service = "curl -s products.example.local | jq ."
 
     # Web Interface
     web_interface = "https://${module.ec2_web_server.public_ip}"
-
-    # SSH Access
-    jumphost_ssh = "ssh -i your-key.pem ec2-user@${module.ec2_client.public_ip}"
   }
 }
 
@@ -83,6 +80,7 @@ output "routing_info" {
         "/inventory"     = "Lambda inventory service"
         "/analytics"     = "ECS Fargate analytics service"
         "/notifications" = "EC2 notifications service"
+        "/health"        = "EC2 health service"
         "default"        = "Lambda notfound service"
       }
     }

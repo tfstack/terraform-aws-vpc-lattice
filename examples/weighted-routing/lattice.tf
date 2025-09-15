@@ -77,7 +77,7 @@ module "vpc_lattice" {
           protocol = "HTTP"
           port     = 80
           vpc_id   = module.vpc_2.vpc_id
-          weight   = 25
+          weight   = 15
           targets = [
             {
               target_id = module.ec2_web_server_1.instance_id
@@ -93,7 +93,7 @@ module "vpc_lattice" {
           }
           tags = {
             TargetGroup = "ec2-web-server-1"
-            Weight      = "25"
+            Weight      = "15"
             Purpose     = "ec2-web-server"
           }
         },
@@ -103,7 +103,7 @@ module "vpc_lattice" {
           protocol = "HTTP"
           port     = 80
           vpc_id   = module.vpc_2.vpc_id
-          weight   = 25
+          weight   = 15
           targets = [
             {
               target_id = module.ec2_web_server_2.instance_id
@@ -119,7 +119,59 @@ module "vpc_lattice" {
           }
           tags = {
             TargetGroup = "ec2-web-server-2"
-            Weight      = "25"
+            Weight      = "15"
+            Purpose     = "ec2-web-server"
+          }
+        },
+        {
+          name     = "ec2-web-server-3"
+          type     = "IP"
+          protocol = "HTTP"
+          port     = 80
+          vpc_id   = module.vpc_2.vpc_id
+          weight   = 15
+          targets = [
+            {
+              target_id = module.ec2_web_server_3.private_ip
+              port      = 8080
+            }
+          ]
+          health_check = {
+            path                = "/"
+            interval            = 10
+            timeout             = 5
+            healthy_threshold   = 1
+            unhealthy_threshold = 2
+          }
+          tags = {
+            TargetGroup = "ec2-web-server-3"
+            Weight      = "15"
+            Purpose     = "ec2-web-server"
+          }
+        },
+        {
+          name     = "ec2-web-server-4"
+          type     = "IP"
+          protocol = "HTTP"
+          port     = 80
+          vpc_id   = module.vpc_2.vpc_id
+          weight   = 15
+          targets = [
+            {
+              target_id = module.ec2_web_server_4.private_ip
+              port      = 8080
+            }
+          ]
+          health_check = {
+            path                = "/"
+            interval            = 10
+            timeout             = 5
+            healthy_threshold   = 1
+            unhealthy_threshold = 2
+          }
+          tags = {
+            TargetGroup = "ec2-web-server-4"
+            Weight      = "15"
             Purpose     = "ec2-web-server"
           }
         },
@@ -152,7 +204,7 @@ module "vpc_lattice" {
         {
           name                           = "lambda-api-1"
           type                           = "LAMBDA"
-          weight                         = 25
+          weight                         = 15
           lambda_event_structure_version = "V1"
           targets = [
             {
@@ -161,7 +213,7 @@ module "vpc_lattice" {
           ]
           tags = merge(local.tags_1, {
             TargetGroup = "lambda-api-1"
-            Weight      = "25"
+            Weight      = "15"
             Purpose     = "lambda-api-1"
           })
         }

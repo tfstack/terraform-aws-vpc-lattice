@@ -28,7 +28,7 @@ module "alb" {
   enable_https     = false
   http_port        = 80
   target_http_port = 80
-  targets          = aws_instance.ec2_web_server_3[*].id
+  targets          = aws_instance.ec2_web_server_5[*].id
   target_type      = "instance"
 
   # Security - Restrict access to VPC only
