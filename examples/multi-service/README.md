@@ -45,7 +45,7 @@ A comprehensive example showing VPC Lattice with multiple services across differ
 - Three VPCs with different service types
 - Path-based routing for API service
 - Weighted routing for products service
-- Multiple target types: Lambda, ALB, ECS Fargate, EC2
+- Multiple target types: Lambda, ALB, ECS Fargate, EC2, IP targets
 - Web interface for testing services
 - IAM authentication and custom domains
 
@@ -58,6 +58,7 @@ A comprehensive example showing VPC Lattice with multiple services across differ
 - `/inventory` → Lambda inventory service
 - `/analytics` → ECS Fargate analytics service
 - `/notifications` → EC2 notifications service
+- `/health` → EC2 health service (IP target)
 - Default → Lambda notfound service
 
 ### Products Service (Weighted routing)
@@ -70,6 +71,7 @@ A comprehensive example showing VPC Lattice with multiple services across differ
 - **Jumphost**: SSH access for command-line testing
 - **Web Server**: Web interface with interactive buttons to test all services
 - **Notifications Service**: EC2-hosted nginx service responding to `/notifications` path
+- **Health Service**: EC2-hosted nginx service responding to `/health` path (IP target)
 
 ## Usage
 
@@ -103,6 +105,7 @@ curl api.example.local/payments
 curl api.example.local/inventory
 curl api.example.local/analytics
 curl api.example.local/notifications
+curl api.example.local/health
 
 # Test products service with weighted routing
 curl products.example.local
@@ -113,6 +116,7 @@ Expected responses:
 - Orders: `{"service":"orders","message":"Order processed"}`
 - Payments: `{"service":"payments","message":"Payment processed"}`
 - Notifications: `{"service":"notifications-service","message":"Notifications Service (EC2)","notifications":[...]}`
+- Health: `{"status":"healthy","service":"health-service","timestamp":"2024-01-15T10:30:00Z"}`
 - Products: `{"service":"products","version":"v1"}` or `{"service":"products","version":"v2"}`
 
 ## Configuration
